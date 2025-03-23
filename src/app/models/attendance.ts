@@ -4,18 +4,12 @@ export interface Student {
     studentId: number;
     name: string;
     std: string;
-    date?:Date;
+    
     status: Status;
 }
 
-// export interface StudentAttendance {
-//     studentId: string;
-//     status: Status;
-// }
-
-export interface Attendance {
+export interface AttendanceRecord{
     studentId: number;
-    
-    date: Date;
-    status: Status;
+    date: string;
+    status:Status;
 }

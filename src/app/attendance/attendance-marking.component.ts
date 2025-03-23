@@ -4,7 +4,7 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AttendanceService } from './attendance.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Subscription, tap } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule, MatButtonToggleGroup } from '@angular/material/button-toggle';
 import { MatSpinnerModule } from '@angular/material/progress-spinner';
@@ -24,7 +24,7 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['name', 'std','status'];
   dataSource = new MatTableDataSource<Student>([]);
   selectedDate: Date = new Date();
-  isLoading: boolean = false;
+  isLoading = false;
   private subscriptions: Subscription[] = [];
   private attendanceService = inject(AttendanceService);
   private _snackBar=inject(MatSnackBar);
@@ -49,13 +49,14 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
           }));
           this.dataSource.data = students;
         }
-        this.isLoading = false;        
+        this.isLoading = false;
+        this.loadAttendanceByDate()
       },
       error: (error) => {
         console.error('Error fetching student for attendance:', error);
         this.dataSource.data = [];
       
-      },
+      },      
       ()=>{
         this.isLoading = false;
       }
@@ -63,16 +64,21 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
     this.subscriptions.push(sub)
   }
   loadAttendanceByDate() {
+    const formattedDate = this.selectedDate.toISOString().split('T')[0];
     this.isLoading = true;
-    const sub = this.attendanceService.getAttendanceByDate(this.selectedDate).subscribe({
+    const sub = this.attendanceService.getAttendanceByDate(formattedDate).subscribe({
       next: (attendanceRecords) => {
         if (attendanceRecords && attendanceRecords.length > 0) {
-          // Reset status of all students to 'absent' before applying attendance
-          this.dataSource.data.forEach(student => student.status = 'absent');
-
+          
+          this.dataSource.data.forEach(student => {
+            student.status = 'absent'
+          });
           attendanceRecords.forEach(attendance => {
             const student = this.findStudent(attendance.studentId);
-            if (student) {              
+            if (student) {   
+              
+               console.log(attendance.status)           
+               
               student.status = attendance.status;
             }
           });
@@ -96,7 +102,9 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
   }
 
   onDateChange(event: MatDatepickerInputEvent<Date>) {
-    this.selectedDate = event.value || new Date();
+    this.selectedDate = event.value as Date;
+    
+    
     this.loadAttendanceByDate();
   }
   
@@ -108,18 +116,21 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
   }
 
   saveAttendance() {
+    const formattedDate = this.selectedDate.toISOString().split('T')[0];
     const attendanceData = this.dataSource.data.map(item => ({
       studentId: item.studentId,
       status: item.status,
-      date: this.selectedDate,
+      date: formattedDate,
     }));
     if(attendanceData.length > 0 ){
       this.isLoading = true;
+      console.log(attendanceData)
       const sub = this.attendanceService.saveAttendance(attendanceData).subscribe(
         (res:any) => {
+          console.log(res)
           if(res && res.message === 'success'){
             this._snackBar.open('Attendance saved successfully', 'Close', {
-              duration: 1000,
+              duration: 3000,
             });            
             this.loadAttendance();
           } else {
@@ -146,7 +157,9 @@ export class AttendanceMarkingComponent implements OnInit, OnDestroy {
     }
   }
   private findStudent(studentId: number): Student | undefined {
-    return this.dataSource.data.find(student => student.studentId === studentId);
+    const student = this.dataSource.data.find(student => student.studentId === studentId);
+    return student
+
   }
 }
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Attendance } from '../models/attendance';
 import { BASE_URL } from '../app.config';
 
@@ -15,8 +15,12 @@ export class AttendanceService {
    * @param date The date for which to retrieve attendance.
    * @returns Observable containing attendance data.
    **/
-  getAttendanceByDate(date: string): Observable<any> {
-    return this.http.get(`${BASE_URL}/api/attendance?date=${date}`);
+  getAttendanceByDate(date: string): Observable<Attendance[]> {
+    return this.http.get<any[]>(`${BASE_URL}/api/attendance?date=${date}`).pipe(
+      map(attendances => attendances.map(attendance => ({
+        ...attendance, date: attendance.date
+      })))
+    );
   }
   /**
    * Fetches student data.
