@@ -1,31 +1,33 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { AttendanceService } from './attendance.service';
-import { Attendance } from '../models/attendance';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { Subscription } from 'rxjs';
-
-interface StudentAttendance {
-  studentId: string;
-  name: string;
-  
-  status: 'present' | 'absent' | '';
-  date: string;
-}
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Subscription, tap } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatSpinnerModule } from '@angular/material/progress-spinner';
+import { Attendance, Student } from '../models/attendance';
+import { MatFormFieldModule, MatFormField } from '@angular/material/form-field';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
-  selector: 'app-attendance-marking',
+  selector: 'app-attendance-marking', 
   templateUrl: './attendance-marking.component.html',
-  styleUrls: ['./attendance-marking.component.css']
+  styleUrls: ['./attendance-marking.component.css'],
+  standalone:true,
+  imports:[CommonModule,MatTableModule,MatButtonModule,MatButtonToggleModule,MatSpinnerModule,MatSnackBarModule,MatFormFieldModule,MatDatepickerModule,MatNativeDateModule]
 })
-export class AttendanceMarkingComponent implements OnInit,OnDestroy {
-  displayedColumns: string[] = ['name', 'status'];
-  dataSource = new MatTableDataSource<StudentAttendance>([]);
+export class AttendanceMarkingComponent implements OnInit, OnDestroy {
+  displayedColumns: string[] = ['name', 'std','status'];
+  dataSource = new MatTableDataSource<Student>([]);
   selectedDate: Date = new Date();
   isLoading: boolean = false;
   private subscriptions: Subscription[] = [];
-  constructor(private attendanceService: AttendanceService,private _snackBar: MatSnackBar) { }
+  private attendanceService = inject(AttendanceService);
+  private _snackBar=inject(MatSnackBar);
 
   ngOnInit(): void {
     this.loadAttendance();
@@ -35,25 +37,24 @@ export class AttendanceMarkingComponent implements OnInit,OnDestroy {
   }
   loadAttendance() {
     this.isLoading = true;
-    const sub= this.attendanceService.getAttendanceByDate(this.selectedDate.toISOString().split('T')[0]).subscribe(
-      (res) => {
-       if(res && res.data){
-        this.dataSource.data = res.data.map(student => ({
-          studentId: student.studentId,
-          name: student.studentName,
-          status: student.status,
-          date: student.date
-        }));
-       } else {
-        this.dataSource.data=[]
-       }
-        
+    const sub = this.attendanceService.getStudentsForAttendance().subscribe({
+      next: (res) => {
+        if (res && res.length > 0) {
+          const students: Student[] = res.map((student) => ({
+            studentId: student.studentId, 
+            name: student.name, // Assuming 'name' is the student's name
+            std: student.std, // Assuming 'standard' is the student's standard
+            status: 'absent' // Default status for new students
+
+          }));
+          this.dataSource.data = students;
+        }
+        this.isLoading = false;        
       },
-      (error) => {
-        this._snackBar.open('Error fetching students for attendance', 'Close', {
-          duration: 3000,
-        });
+      error: (error) => {
         console.error('Error fetching student for attendance:', error);
+        this.dataSource.data = [];
+      
       },
       ()=>{
         this.isLoading = false;
@@ -61,36 +62,65 @@ export class AttendanceMarkingComponent implements OnInit,OnDestroy {
     );
     this.subscriptions.push(sub)
   }
+  loadAttendanceByDate() {
+    this.isLoading = true;
+    const sub = this.attendanceService.getAttendanceByDate(this.selectedDate).subscribe({
+      next: (attendanceRecords) => {
+        if (attendanceRecords && attendanceRecords.length > 0) {
+          // Reset status of all students to 'absent' before applying attendance
+          this.dataSource.data.forEach(student => student.status = 'absent');
+
+          attendanceRecords.forEach(attendance => {
+            const student = this.findStudent(attendance.studentId);
+            if (student) {              
+              student.status = attendance.status;
+            }
+          });
+        } else {
+          this.dataSource.data.forEach(student => student.status = 'absent');
+        }
+        
+        this.dataSource.data = [...this.dataSource.data];
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching attendance by date:', error);
+        // Optionally handle error by showing a message to the user
+        this._snackBar.open('Error fetching attendance for selected date', 'Close', { duration: 3000 });
+      },
+      ()=>{
+        this.isLoading = false;
+      }
+    });
+    this.subscriptions.push(sub);
+  }
 
   onDateChange(event: MatDatepickerInputEvent<Date>) {
     this.selectedDate = event.value || new Date();
-    this.loadAttendance();
+    this.loadAttendanceByDate();
   }
-  findStudent(studentId:string){
-    return this.dataSource.data.find(e=>e.studentId===studentId)
-  }
-  markAttendance(element: StudentAttendance, status: 'present' | 'absent') {
-    const student=this.findStudent(element.studentId);
-    if(student){
+  
+  markAttendance(element: Student, status: 'present' | 'absent' ) {
+    const student = this.findStudent(element.studentId,);
+    if (student) {
       student.status = status;
     }
-    
   }
 
   saveAttendance() {
     const attendanceData = this.dataSource.data.map(item => ({
       studentId: item.studentId,
       status: item.status,
-      date: this.selectedDate.toISOString().split('T')[0],
-    })).filter(item => item.status !== '');
+      date: this.selectedDate,
+    }));
     if(attendanceData.length > 0 ){
       this.isLoading = true;
-      const sub= this.attendanceService.saveAttendance(attendanceData).subscribe(
-        (res) => {
-          if(res && res.status === 'success'){
+      const sub = this.attendanceService.saveAttendance(attendanceData).subscribe(
+        (res:any) => {
+          if(res && res.message === 'success'){
             this._snackBar.open('Attendance saved successfully', 'Close', {
-              duration: 3000,
-            });
+              duration: 1000,
+            });            
             this.loadAttendance();
           } else {
             this._snackBar.open('Error saving attendance', 'Close', {
@@ -114,20 +144,15 @@ export class AttendanceMarkingComponent implements OnInit,OnDestroy {
         duration: 3000,
       });
     }
-    
   }
-  presentAbsent(status:any){
-    if(status === 'present'){
-      return true
-    } else if (status === 'absent'){
-      return false
-    } else {
-      return null
-    }
-    
-    
-      }
+  private findStudent(studentId: number): Student | undefined {
+    return this.dataSource.data.find(student => student.studentId === studentId);
+  }
 }
+
+
+
+
 ```
 ```typescript
 import { Injectable } from '@angular/core';

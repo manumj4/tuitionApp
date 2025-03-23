@@ -1,79 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable, of, map } from 'rxjs';
 import { BASE_URL } from '../app.config';
 import { Student } from '../models/student';
 
 @Injectable({
   providedIn: 'root',
 })
-export class StudentMasterService {
-  private apiUrl = '/api/student'; // API URL for student operations
-  private baseUrl = BASE_URL;
-  constructor(private http: HttpClient) { }
-  getStudents(): Observable<{ data: Student[] }> {
-    const url = `${this.baseUrl}${this.apiUrl}`;
-    return this.http.get<{ data: Student[] }>(url); // Gets all students
+export class StudentMasterService {  
+  private apiUrl = `${BASE_URL}/api/student`;
+
+  constructor(private http: HttpClient) {}
+
+  getStudents(): Observable<{ data: Student[] }> {    
+    return this.http.get<{ data: Student[] }>(this.apiUrl).pipe(
+      map(response => response)
+    );
   }
 
-  filterStudents(students: Student[], name: string, std: string): Observable<Student[]> {
+  filterStudents(students: { data: Student[] }, name: string, std: number): Observable<{ data: Student[] }> {
     if (!name && !std) {
-      return of(students);
+      return of(students)
     }
-    return of(students.filter(student => {
-      const nameMatch = name ? student.name.toLowerCase().includes(name.toLowerCase()) : true;
-      const stdMatch = std ? student.std === Number(std) : true;
-      return nameMatch && stdMatch;
-    }));
+    const filteredStudents = students.data.filter(student => {
+      const nameMatch = name ? student.name.toLowerCase().includes(name.toLowerCase()) : true
+      const stdMatch = std ? student.std === std : true
+      return nameMatch && stdMatch
+    })
+    return of({data:filteredStudents})
   }
 
-  addStudent(studentDetails: { name: string, std: number, subject: string, mobile: string, fees: number }): Observable<{ status: string }> {    
-    const url = `${this.baseUrl}${this.apiUrl}`;
-    return this.http.post<{ status: string }>(url, studentDetails); // Adds a new student
+  addStudent(studentDetails: Student): Observable<{ data: Student[] }> {   
+    return this.http.post<{ data: Student[] }>(this.apiUrl, studentDetails).pipe(
+      map(response => response)
+    );
   }
+
 }
-
-
-
-
-
-
-
-@Injectable({
-    providedIn: 'root',
-})
-export class StudentMasterService {
-    private apiUrl = '/api/student'; // API URL for student operations
-
-    constructor(private http: HttpClient) { }
-
-    setApiUrl(url: string) {
-        this.apiUrl = url;
-    }
-    getStudents(): Observable<{ data: Student[] }> {
-        if (!this.apiUrl.includes("api/student")) {
-            return throwError(() => new Error("Api Url not set Properly"));
-        }
-        return this.http.get<{ data: Student[] }>(this.apiUrl); // Gets all students
-  }
-
-  filterStudents(students: Student[], name: string, std: string): Observable<Student[]> {
-    if (!name && !std) {
-      return of(students);
-    }
-
-    return of(students.filter(student => {
-      const nameMatch = name ? student.name.toLowerCase().includes(name.toLowerCase()) : true;
-      const stdMatch = std ? student.std.toLowerCase().includes(std.toLowerCase()) : true;
-      return nameMatch && stdMatch;
-    }));
-  }
-
-  addStudent(studentDetails: { name: string, std: number, subject: string, mobile: string, fees: number }): Observable<{ status: string }> {
-    if (!this.apiUrl.includes("api/student")) {
-        return throwError(() => new Error("Api Url not set Properly"));
-    }
-    return this.http.post<{ status: string }>(this.apiUrl, studentDetails); // Adds a new student
-  }
-}*/

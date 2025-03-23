@@ -1,8 +1,8 @@
 export interface Student {
   name: string;
   std: number;
-  subject: string;
+  subjects: string;
   mobile: string;
   fees: number;
-  dateOfJoining: string; 
+  dateOfJoining: Date; 
 }

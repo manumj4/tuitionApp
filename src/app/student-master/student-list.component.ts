@@ -1,33 +1,40 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, inject } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { StudentMasterService } from '../student-master.service';
+import { StudentMasterService } from '../student-master/student-master.service';
 import { Student} from '../models/student';
 import { MatDialog } from '@angular/material/dialog';
-import { AddStudentComponent } from '../add-student/add-student.component';
 import { Subject, takeUntil } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableModule } from '@angular/material/table';
+import { MatInputModule } from '@angular/material/input';
+import { MatSortModule } from '@angular/material/sort';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-student-list',
   templateUrl: './student-list.component.html',
-  styleUrls: ['./student-list.component.css']
+  styleUrls: ['./student-list.component.css'],
+  standalone: true,
+  imports: [MatTableModule, MatInputModule, MatSortModule, MatPaginatorModule, MatButtonModule, MatDialogModule,CommonModule]
 })
 export class StudentListComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['name', 'std', 'mobile', 'fees', 'dateOfJoining'];
-  dataSource!: MatTableDataSource<Student>;
+  displayedColumns: string[] = ['name', 'std', 'mobile', 'fees', 'dateOfJoining','actions'];
+  dataSource: MatTableDataSource<Student> = new MatTableDataSource<Student>([]);
+  
   private destroyed$ = new Subject<void>();
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  
+  constructor(private studentService: StudentMasterService,public dialog: MatDialog, private snackBar: MatSnackBar) {
+  }
 
-
-  ngOnInit(): void {
-    this.getStudents();
-    
+  ngOnInit() {
+    this.getStudents();    
   }
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
@@ -37,7 +44,7 @@ export class StudentListComponent implements OnInit, AfterViewInit, OnDestroy {
   getStudents(): void {
     this.studentService.getStudents().pipe(takeUntil(this.destroyed$)).subscribe({
       next:(response) => {
-        this.dataSource = new MatTableDataSource(response.data);
+        this.dataSource.data = response.data;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       },
@@ -46,28 +53,13 @@ export class StudentListComponent implements OnInit, AfterViewInit, OnDestroy {
 
       }
     });
-  }
-  
-  openAddStudentDialog(): void {
-    const dialogRef = this.dialog.open(AddStudentComponent, {
-      width: '400px' 
-    });
-    dialogRef.afterClosed().pipe(takeUntil(this.destroyed$)).subscribe(result => {
-      if (result) {
-        this.studentService.addStudent(result).pipe(takeUntil(this.destroyed$)).subscribe({
-          next: (response) => {
-            this.getStudents();
-            this.showSnackBar('Student added successfully', 'Close');
-          },
-          error: (error) => {
-            this.showSnackBar('Error in adding student', 'Close');
-          }
-        });
-      }
-    });
+  } 
+  openAddStudentDialog() {
+    
   }
 
   applyFilter(event: Event) {
+    this.dataSource.filterPredicate = (data: Student, filter: string) => data.name.toLowerCase().includes(filter);
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
@@ -76,12 +68,10 @@ export class StudentListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
   
-  applyFilterByStd(event: Event) {
+  applyFilterByStd(event: Event) {   
+    this.dataSource.filterPredicate = (data: Student, filter: string) => data.std.toLowerCase().includes(filter);
     const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filterPredicate = (data: Student, filter: string) => {
-      return data.std.toLowerCase().includes(filter);
-    };
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
@@ -96,8 +86,6 @@ export class StudentListComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
-  }
-  constructor(private studentService: StudentMasterService,public dialog: MatDialog, private snackBar: MatSnackBar) {
   }
 }
 ```
