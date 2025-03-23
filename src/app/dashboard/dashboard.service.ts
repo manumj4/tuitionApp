@@ -4,32 +4,11 @@ import { Observable } from 'rxjs';
 import { BASE_URL } from '../app.config';
 import { DashboardData } from '../models/dashboard';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DashboardService {
-  private apiUrl = 'api/dashboard'; // API URL will be updated later
-  private baseUrl = BASE_URL;
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getDashboardData(): Observable<DashboardData> {
-    const url = `${this.baseUrl}/${this.apiUrl}`
-    return this.http.get<DashboardData>(url);
+    return this.http.get<DashboardData>(`${BASE_URL}/api/dashboard`);
   }
-  // getTotalStudents(): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/total-students`); 
-  // }
-
-  // getTotalFees(): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/total-fees`); 
-  // }
-
-  // getStudentAddRemoveLast5Months(): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/student-add-remove-last-5-months`); 
-  // }
-
-  // getFeesCollectedLast5Months(): Observable<any> {
-  //   return this.http.get(`${this.apiUrl}/fees-collected-last-5-months`); 
-  // }
-
 }

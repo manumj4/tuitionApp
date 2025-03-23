@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
 // Declare the base URL
-export const BASE_URL = "http://your-backend-url";
+export const BASE_URL = "http://localhost:3000";
 
 // Application configuration
 export const appConfig: ApplicationConfig = {
