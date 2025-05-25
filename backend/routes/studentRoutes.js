@@ -1,34 +1,67 @@
 const express = require('express');
 const router = express.Router();
-const Student = require('../models/student');
+const { getCollection } = require('../models/collections');
+const { authMiddleware } = require('../middleware/authMiddleware');
+const { ObjectId } = require('mongodb');
 
-// Get all students
-router.get('/', async (req, res) => {
-  try {
-    const students = await Student.find();
-    res.json({data:students});
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+// GET all students
+router.get('/', authMiddleware, async (req, res) => {
+  const students = getCollection('students');
+  const data = await students.find({}).sort({ fullName: 1 }).toArray();
+  res.json(data);
 });
 
-// Add a student
-router.post('/', async (req, res) => {
-  const student = new Student({
-    name: req.body.name,
-    std: req.body.std,
-    subject: req.body.subject,
-    mobile: req.body.mobile,
-    fees: req.body.fees,
-    dateOfJoining:req.body.dateOfJoining || new Date()
+// POST - Add student
+router.post('/', authMiddleware, async (req, res) => {
+  const { fullName, class: stdClass, mobile, status, admissionDate, fees } = req.body;
+  if (!fullName || !stdClass || !mobile) {
+    return res.status(400).json({ message: 'Required fields missing' });
+  }
+
+  const students = getCollection('students');
+  await students.insertOne({
+    fullName,
+    class: stdClass,
+    mobile,
+    status: status || 'Active',
+    admissionDate: Date.now(),
+    fees: fees || 0,
+    createdAt: Date.now(),
   });
 
-  try {
-    const newStudent = await student.save();
-    res.status(201).json({status:"success"});
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
+  res.json({ message: 'Student added' });
+});
+
+// PUT - Update student
+router.put('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { fullName, class: stdClass, mobile, status, admissionDate, fees } = req.body;
+
+  const students = getCollection('students');
+  await students.updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        fullName,
+        class: stdClass,
+        mobile,
+        status,
+        admissionDate,
+        fees
+      }
+    }
+  );
+
+  res.json({ message: 'Student updated' });
+});
+
+// DELETE - Archive/Delete student
+router.delete('/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const students = getCollection('students');
+  await students.deleteOne({ _id: new ObjectId(id) });
+
+  res.json({ message: 'Student deleted' });
 });
 
 module.exports = router;

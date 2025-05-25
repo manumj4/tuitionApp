@@ -1,23 +1,33 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const path = require('path');
 const cors = require('cors');
-const dotenv = require('dotenv');
+require('dotenv').config();
+const { connectToDB } = require('./models/db');
 
-dotenv.config();
+const authRoutes = require('./routes/authRoutes');
+const studentRoutes = require('./routes/studentRoutes');
+const feeRoutes = require('./routes/feeRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes');
+const userRoutes = require('./routes/userRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
 app.use(cors());
 app.use(express.json());
+console.log("before start connect db");
+connectToDB(() => {
+  app.use('/api/auth', authRoutes);
+  app.use('/api/students', studentRoutes);
+  app.use('/api/fees', feeRoutes);
+  app.use('/api/attendance', attendanceRoutes);
+  app.use('/api/users', userRoutes);
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('MongoDB connection error:', err));
+  app.use('/api/dashboard', dashboardRoutes);
+  app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '../frontend', '404.html'));
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
+
