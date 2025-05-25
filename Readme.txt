@@ -4,6 +4,9 @@ node server.js
 cd frontend
 python -m http.server 8000
 
+npm install -g http-server
+http-server . -p 8000
+
 
 student format
 
