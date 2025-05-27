@@ -4,6 +4,6 @@ const config = {
     apiUrl: "https://your-backend-api.onrender.com"
   },
   local: {
-    apiUrl: "https://spark-tuition.onrender.com"
+    apiUrl: "https://spark-tuition.onrender.com/api"
   }
 };

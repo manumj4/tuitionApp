@@ -1,5 +1,8 @@
+// let env = config["env"];
+// const apiPath = config[env].apiUrl; 
 const token = localStorage.getItem('token');
-const API = 'http://localhost:3000/api/users';
+// const API = apiPath + '/users';
+const API = "https://spark-tuition.onrender.com/api" + '/users';
 
 let currentUsers = []; // store loaded users here for edit
 const user = JSON.parse(localStorage.getItem('user'));

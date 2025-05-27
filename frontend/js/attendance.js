@@ -25,7 +25,7 @@ async function loadAttendance() {
   if (search) params.append('search', search);
   // let env = config["env"];
   // const API = config[env].apiUrl + '/attendance';
-  const API = "https://spark-tuition.onrender.com"+ '/attendance';
+  const API = "https://spark-tuition.onrender.com/api"+ '/attendance';
 
   const data = await fetchJSON(`${API}?${params}`);
   const tbody = document.getElementById('attTable');

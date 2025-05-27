@@ -17,7 +17,7 @@ async function fetchDashboardData() {
   //   let env = config["env"];
   //   const API = config[env].apiUrl; 
     // const apiUrl = API + '/dashboard/summary';
-    const apiUrl = "https://spark-tuition.onrender.com" + '/dashboard/summary';
+    const apiUrl = "https://spark-tuition.onrender.com/api" + '/dashboard/summary';
 
     const res = await fetch(apiUrl, {
       headers: { Authorization: `Bearer ${token}` },
