@@ -13,11 +13,18 @@
 
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
+//   let env = config["env"];
+// const API = config[env].apiUrl;
+  // const config = require('./../../../config');
+  // let env = config["env"];
+  // const API = config[env].apiUrl;
+  // const API = "https://spark-tuition.onrender.com"; // Replace with your actual API URL
+
   const mobile = document.getElementById('mobile').value;
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/login', {
+    const response = await fetch( "https://spark-tuition.onrender.com" + '/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile, password })

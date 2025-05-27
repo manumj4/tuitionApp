@@ -10,11 +10,15 @@
 })();
 
 const token = localStorage.getItem('token');
-const apiUrl = 'http://localhost:3000/api/dashboard/summary';
 
 // Fetch dashboard data from API
 async function fetchDashboardData() {
   try {
+  //   let env = config["env"];
+  //   const API = config[env].apiUrl; 
+    // const apiUrl = API + '/dashboard/summary';
+    const apiUrl = "https://spark-tuition.onrender.com" + '/dashboard/summary';
+
     const res = await fetch(apiUrl, {
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -1,4 +1,7 @@
-const API = 'http://localhost:3000/api/attendance';
+// const config = require('./../../../config.json');
+// let env = config["env"];
+// const API = config[env].apiUrl + '/attendance';
+
 const token = localStorage.getItem('token');
 document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
 
@@ -20,6 +23,9 @@ async function loadAttendance() {
 
   const params = new URLSearchParams({ date });
   if (search) params.append('search', search);
+  // let env = config["env"];
+  // const API = config[env].apiUrl + '/attendance';
+  const API = "https://spark-tuition.onrender.com"+ '/attendance';
 
   const data = await fetchJSON(`${API}?${params}`);
   const tbody = document.getElementById('attTable');
