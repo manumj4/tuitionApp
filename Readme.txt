@@ -7,6 +7,9 @@ python -m http.server 8000
 npm install -g http-server
 http-server . -p 8000
 
+in aws
+  pm2 start http-server --name "http-server" -- -p 8000
+  pm2 start $(which http-server) -- -p 8000 -a 0.0.0.0 -c-1 --no-cache --proxy http://localhost:8000/?
 
 student format
 

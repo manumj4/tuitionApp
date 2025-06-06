@@ -2,8 +2,14 @@
 // let env = config["env"];
 // const API = config[env].apiUrl + '/attendance';
 
+
 const token = localStorage.getItem('token');
+const ip = localStorage.getItem('ip');
 document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
+// const res = await fetch('../ipAddress/public_ip.json');
+// let result = await res.json();
+// const ip = result.ip
+
 
 async function fetchJSON(url, options = {}) {
   const res = await fetch(url, {
@@ -25,7 +31,7 @@ async function loadAttendance() {
   if (search) params.append('search', search);
   // let env = config["env"];
   // const API = config[env].apiUrl + '/attendance';
-  const API = "https://spark-tuition.onrender.com/api"+ '/attendance';
+  const API = `http://${ip}:3000/api`+ '/attendance';
 
   const data = await fetchJSON(`${API}?${params}`);
   const tbody = document.getElementById('attTable');

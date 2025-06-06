@@ -1,8 +1,12 @@
 // authCheck.js logic
+const ip = "";
+// const res = await fetch('../ipAddress/public_ip.json');
+// let result = await res.json();
+// ip = result.ip
 (function() {
   const token = localStorage.getItem('token');
   const user = localStorage.getItem('user');
-  
+  ip = localStorage.getItem('ip')
   if (!token || !user) {
     alert('Session expired. Please log in again.');
     window.location.href = 'index.html';
@@ -10,14 +14,13 @@
 })();
 
 const token = localStorage.getItem('token');
-
 // Fetch dashboard data from API
 async function fetchDashboardData() {
   try {
   //   let env = config["env"];
   //   const API = config[env].apiUrl; 
     // const apiUrl = API + '/dashboard/summary';
-    const apiUrl = "https://spark-tuition.onrender.com/api" + '/dashboard/summary';
+    const apiUrl = `http://${ip}:3000/api` + '/dashboard/summary';
 
     const res = await fetch(apiUrl, {
       headers: { Authorization: `Bearer ${token}` },

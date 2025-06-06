@@ -1,8 +1,13 @@
 // let env = config["env"];
 // const apiPath = config[env].apiUrl; 
 const token = localStorage.getItem('token');
-// const API = apiPath + '/users';
-const API = "https://spark-tuition.onrender.com/api" + '/users';
+// const API = apiPath + '/users';+
+
+// const res = await fetch('../ipAddress/public_ip.json');
+// let result = await res.json();
+const ip = localStorage.getItem('ip')
+
+const API = `http://${ip}:3000/api` + '/users';
 
 let currentUsers = []; // store loaded users here for edit
 const user = JSON.parse(localStorage.getItem('user'));

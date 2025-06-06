@@ -2,7 +2,11 @@
 // let env = config["env"];
 // const API = config[env].apiUrl
 // const API_URL = API + '/students';
-const API_URL = "https://spark-tuition.onrender.com" + '/students';
+// const res = await fetch('../ipAddress/public_ip.json');
+// let result = await res.json();
+// const ip = result.ip;
+const ip = localStorage.getItem('ip')
+const API_URL = `http://${ip}:3000/api` + '/students';
 const token = localStorage.getItem('token');
 
 async function fetchStudents() {

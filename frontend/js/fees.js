@@ -1,7 +1,11 @@
 // const config = require('./../../../config.json');
 // let env = config["env"];
 // const API = config[env].apiUrl
-const API = "https://spark-tuition.onrender.com/api"; // Replace with your actual API URL
+// const res = await fetch('../ipAddress/public_ip.json');
+// let result = await res.json();
+// const ip = result.ip
+const ip = localStorage.getItem('ip')
+const API = `http://${ip}:3000/api`; // Replace with your actual API URL
 
 const API_URL = API + '/fees';
 const STUDENTS_API = API +  '/students';

@@ -10,6 +10,7 @@
 // })();
 // localStorage.setItem('token', response.token);
 // localStorage.setItem('user', JSON.stringify(response.user)); // Save user data
+const ip = localStorage.getItem('ip')
 
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -18,13 +19,17 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   // const config = require('./../../../config');
   // let env = config["env"];
   // const API = config[env].apiUrl;
-  // const API = "https://spark-tuition.onrender.com/api"; // Replace with your actual API URL
+  // const API = "http://localhost:3000/api"; // Replace with your actual API URL
+  // const res = await fetch('../ipAddress/public_ip.json');
+  // let result = await res.json();
+  // const ip = result.ip
 
   const mobile = document.getElementById('mobile').value;
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch( "https://spark-tuition.onrender.com/api" + '/auth/login', {
+    const response = await fetch( `http://${ip}:3000/api` + '/auth/login', {
+    // const response = await fetch( `http://localhost:3000/api` + '/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mobile, password })
