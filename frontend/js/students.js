@@ -25,6 +25,7 @@ function renderStudents(students) {
       <tr>
         <td>${stu.fullName}</td>
         <td>${stu.class}</td>
+        <td>${stu.board}</td>
         <td>${stu.mobile}</td>
         <td>${stu.fees}</td>
         <td>${stu.status}</td>
@@ -42,6 +43,7 @@ document.getElementById('studentForm').addEventListener('submit', async function
   const payload = {
     fullName: document.getElementById('studentName').value,
     class: document.getElementById('studentClass').value,
+    board: document.getElementById('studentBoard').value,
     mobile: document.getElementById('studentMobile').value,
     fees: document.getElementById('studentFees').value,
     status: document.getElementById('studentStatus').value,

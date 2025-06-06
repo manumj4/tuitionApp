@@ -25,6 +25,7 @@
         <tr>
           <th>Name</th>
           <th>Class</th>
+          <th>Board</th>
           <th>Mobile</th>
           <th>Fees</th>
           <th>Status</th>
@@ -53,6 +54,19 @@
             <div class="mb-3">
               <label for="studentClass" class="form-label">Class</label>
               <input type="text" id="studentClass" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label for="studentBoard" class="form-label">Board</label>
+              <select class="form-control" id="studentBoard"  required>
+                <option value="" selected disabled>Select Board</option>
+                <option value="CBSE">CBSE</option>
+                <option value="Metric">Metric</option>
+                <option value="ICSE">ICSE</option>
+                <option value="State Board">State Board</option>
+                <option value="IB">IB</option>
+                <option value="IGCSE">IGCSE</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
             <div class="mb-3">
               <label for="studentMobile" class="form-label">Mobile Number</label>

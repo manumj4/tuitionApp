@@ -13,7 +13,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // POST - Add student
 router.post('/', authMiddleware, async (req, res) => {
-  const { fullName, class: stdClass, mobile, status, admissionDate, fees } = req.body;
+  const { fullName, class: stdClass,board, mobile, status, admissionDate, fees } = req.body;
   if (!fullName || !stdClass || !mobile) {
     return res.status(400).json({ message: 'Required fields missing' });
   }
@@ -22,6 +22,7 @@ router.post('/', authMiddleware, async (req, res) => {
   await students.insertOne({
     fullName,
     class: stdClass,
+    board,
     mobile,
     status: status || 'Active',
     admissionDate: Date.now(),
@@ -35,7 +36,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // PUT - Update student
 router.put('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { fullName, class: stdClass, mobile, status, admissionDate, fees } = req.body;
+  const { fullName, class: stdClass, board,mobile, status, admissionDate, fees } = req.body;
 
   const students = getCollection('students');
   await students.updateOne(
@@ -44,6 +45,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       $set: {
         fullName,
         class: stdClass,
+        board,
         mobile,
         status,
         admissionDate,
