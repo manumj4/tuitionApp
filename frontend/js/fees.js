@@ -4,12 +4,20 @@
 // const res = await fetch('../ipAddress/public_ip.json');
 // let result = await res.json();
 // const ip = result.ip
-const ip = localStorage.getItem('ip')
+let ip = localStorage.getItem('ip')
+ip = "65.0.181.26"
 const API = `http://${ip}:3000/api`; // Replace with your actual API URL
 
 const API_URL = API + '/fees';
 const STUDENTS_API = API +  '/students';
 const token = localStorage.getItem('token');
+
+const user = JSON.parse(localStorage.getItem('user'));
+if (!user || user.role !== 'Admin') {
+  alert('Access denied');
+  window.location.href = '/attendance.html'; // or redirect to dashboard/homepage
+  // document.getElementById('bodyContent').style.display = 'block';
+}
 
 const feeTableBody = document.getElementById('feeTable');
 const searchInput = document.getElementById('searchStudent');

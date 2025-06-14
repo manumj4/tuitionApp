@@ -5,9 +5,17 @@
 // const res = await fetch('../ipAddress/public_ip.json');
 // let result = await res.json();
 // const ip = result.ip;
-const ip = localStorage.getItem('ip')
+let ip = localStorage.getItem('ip')
+ip = "65.0.181.26"
 const API_URL = `http://${ip}:3000/api` + '/students';
 const token = localStorage.getItem('token');
+
+
+const user = JSON.parse(localStorage.getItem('user'));
+if (!user || user.role !== 'Admin') {
+  alert('Access denied');
+  window.location.href = 'attendance.html'; // or redirect to dashboard/homepage
+}
 
 async function fetchStudents() {
   const res = await fetch(API_URL, {
@@ -74,6 +82,7 @@ function editStudent(stu) {
   document.getElementById('studentId').value = stu._id;
   document.getElementById('studentName').value = stu.fullName;
   document.getElementById('studentClass').value = stu.class;
+  document.getElementById('studentBoard').value = stu.board;
   document.getElementById('studentMobile').value = stu.mobile;
   document.getElementById('studentFees').value = stu.fees;
   document.getElementById('studentStatus').value = stu.status;
@@ -94,6 +103,7 @@ function resetStudentForm() {
   document.getElementById('studentId').value = '';
   document.getElementById('fullName').value = '';
   document.getElementById('class').value = '';
+  document.getElementById('board').value = '';
   document.getElementById('mobile').value = '';
   document.getElementById('status').value = 'Active';
   document.getElementById('admissionDate').value = '';

@@ -14,7 +14,7 @@ router.get('/', authMiddleware, async (req, res) => {
 // POST - Add student
 router.post('/', authMiddleware, async (req, res) => {
   const { fullName, class: stdClass,board, mobile, status, admissionDate, fees } = req.body;
-  if (!fullName || !stdClass || !mobile) {
+  if (!fullName || !stdClass) {
     return res.status(400).json({ message: 'Required fields missing' });
   }
 

@@ -1,5 +1,5 @@
 // authCheck.js logic
-const ip = "";
+let ip = "";
 // const res = await fetch('../ipAddress/public_ip.json');
 // let result = await res.json();
 // ip = result.ip
@@ -7,6 +7,7 @@ const ip = "";
   const token = localStorage.getItem('token');
   const user = localStorage.getItem('user');
   ip = localStorage.getItem('ip')
+  ip = "65.0.181.26"
   if (!token || !user) {
     alert('Session expired. Please log in again.');
     window.location.href = 'index.html';

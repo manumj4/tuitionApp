@@ -5,8 +5,8 @@ const token = localStorage.getItem('token');
 
 // const res = await fetch('../ipAddress/public_ip.json');
 // let result = await res.json();
-const ip = localStorage.getItem('ip')
-
+let ip = localStorage.getItem('ip')
+ip = "65.0.181.26"
 const API = `http://${ip}:3000/api` + '/users';
 
 let currentUsers = []; // store loaded users here for edit

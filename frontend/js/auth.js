@@ -10,8 +10,8 @@
 // })();
 // localStorage.setItem('token', response.token);
 // localStorage.setItem('user', JSON.stringify(response.user)); // Save user data
-const ip = localStorage.getItem('ip')
-
+let ip = localStorage.getItem('ip')
+ip = "65.0.181.26"
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 //   let env = config["env"];

@@ -4,11 +4,12 @@
 
 
 const token = localStorage.getItem('token');
-const ip = localStorage.getItem('ip');
+let ip = localStorage.getItem('ip');
 document.getElementById('filterDate').value = new Date().toISOString().split('T')[0];
 // const res = await fetch('../ipAddress/public_ip.json');
 // let result = await res.json();
 // const ip = result.ip
+ip = "65.0.181.26"
 const API = `http://${ip}:3000/api`+ '/attendance';
 
 
